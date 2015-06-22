@@ -11,7 +11,9 @@
         android:id="@+id/searchText"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:hint="Search for artist..." />
+        android:hint="Search for artist..."
+        android:imeOptions="actionDone"
+        android:singleLine="true"/>
 
     <ListView
         android:layout_width="wrap_content"
