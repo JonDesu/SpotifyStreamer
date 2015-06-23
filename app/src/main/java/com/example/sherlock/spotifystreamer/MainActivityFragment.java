@@ -2,6 +2,7 @@ package com.example.sherlock.spotifystreamer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,11 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -54,7 +57,7 @@ public class MainActivityFragment extends Fragment {
                 new EditText.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                             // your action here
                             String searchString = searchEditText.getText().toString();
 
@@ -74,8 +77,6 @@ public class MainActivityFragment extends Fragment {
                 }
         );
 
-
-
         ArrayList<ArtistInfo> artistInfoList = new ArrayList<ArtistInfo>();
 
         mAdapter = new ArtistInfoAdapter(this.getActivity(),R.layout.list_item_artitsts, artistInfoList);
@@ -83,6 +84,16 @@ public class MainActivityFragment extends Fragment {
         //Reference to listview, and attach adapter
         ListView listView = (ListView) rootView.findViewById(R.id.artistResultListView);
         listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                ArtistInfo selectedArtist = mAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), TopTracksActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, selectedArtist.id);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
@@ -90,14 +101,16 @@ public class MainActivityFragment extends Fragment {
     public class ArtistInfo {
         public String iconUrl;
         public String title;
+        public String id;
         public ArtistInfo(){
             super();
         }
 
-        public ArtistInfo(String iconUrl, String title) {
+        public ArtistInfo(String iconUrl, String title, String id) {
             super();
             this.iconUrl = iconUrl;
             this.title = title;
+            this.id = id;
         }
     }
 
@@ -126,7 +139,6 @@ public class MainActivityFragment extends Fragment {
                 holder = new ArtistInfoHolder();
                 holder.imageIcon = (ImageView)convertView.findViewById(R.id.list_item_artists_imageview);
                 holder.textName = (TextView)convertView.findViewById(R.id.list_item_artists_textview);
-
                 convertView.setTag(holder);
             }
             else
@@ -136,7 +148,7 @@ public class MainActivityFragment extends Fragment {
 
             ArtistInfo artistInfo = artistList.get(position);
             holder.textName.setText(artistInfo.title);
-            Picasso.with(this.context).load(artistInfo.iconUrl).into(holder.imageIcon);
+            Picasso.with(this.context).load(artistInfo.iconUrl).transform(new CircleTransform()).into(holder.imageIcon);
 
 
             return convertView;
@@ -177,30 +189,36 @@ public class MainActivityFragment extends Fragment {
 
             if (artistPagerResults == null) return;
 
-            List<Artist> artistList = artistPagerResults.artists.items;
-
-            if (artistPagerResults.artists.total > 0) {
-
-                mAdapter.clear();
-                for (int i = 0; i < artistList.size(); i++) {
-
-                    String artistImageUrl = "http://cdn.embed.ly/providers/logos/spotify.png";
-                    String artistTextName = null;
-
-                    try{
-                        artistImageUrl = artistList.get(i).images.get(0).url;
-                        artistTextName = artistList.get(i).name;
-                    }
-                    catch(Exception err){
-                        Log.e(LOG_TAG, "Error : " + err);
-                        continue;
-                    }
-                    ArtistInfo currArtistInfo = new ArtistInfo(artistImageUrl,artistTextName);
-                    mAdapter.add(currArtistInfo);
-                }
-                mAdapter.notifyDataSetChanged();
+            if (artistPagerResults.artists.total == 0){
+                Toast.makeText(getActivity(), "No Artists found..", Toast.LENGTH_SHORT).show();
+                return;
             }
 
+            List<Artist> artistList = artistPagerResults.artists.items;
+
+            mAdapter.clear();
+            for (int i = 0; i < artistList.size(); i++) {
+
+                String artistImageUrl = "http://cdn.embed.ly/providers/logos/spotify.png";
+                String artistTextName = null;
+                String artistId = null;
+
+                if(artistList.get(i).images.size() == 0) continue;
+
+                try{
+                    artistImageUrl = artistList.get(i).images.get(0).url;
+                    artistTextName = artistList.get(i).name;
+                    artistId = artistList.get(i).id;
+                }
+                catch(Exception err){
+                    Log.e(LOG_TAG, "Error Occured, Skipping artist.. : " + err);
+                }
+
+                ArtistInfo currArtistInfo = new ArtistInfo(artistImageUrl,artistTextName,artistId);
+                mAdapter.add(currArtistInfo);
+            }
+            mAdapter.notifyDataSetChanged();
         }
     }
+
 }
