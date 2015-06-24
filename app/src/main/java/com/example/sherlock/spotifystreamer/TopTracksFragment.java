@@ -119,7 +119,7 @@ public class TopTracksFragment extends Fragment {
                     trackName = trackList.get(i).name;
                 }
                 catch(Exception err){
-                    Log.e(LOG_TAG, "Unknown Error: " + err.getMessage());
+                    Log.e(LOG_TAG, "Error occurred while getting track info : " + err.getMessage());
                 }
 
                 TrackInfo currArtistInfo = new TrackInfo(albumImageUrl,albumName,trackName);

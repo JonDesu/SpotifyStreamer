@@ -134,11 +134,11 @@ public class MainActivityFragment extends Fragment {
             mAdapter.clear();
             for (int i = 0; i < artistList.size(); i++) {
 
-                String artistImageUrl = "http://cdn.embed.ly/providers/logos/spotify.png";
-                String artistTextName = null;
-                String artistId = null;
-
                 if(artistList.get(i).images.size() == 0) continue;
+
+                String artistImageUrl;
+                String artistTextName;
+                String artistId;
 
                 try{
                     artistImageUrl = artistList.get(i).images.get(0).url;
@@ -146,7 +146,8 @@ public class MainActivityFragment extends Fragment {
                     artistId = artistList.get(i).id;
                 }
                 catch(Exception err){
-                    Log.e(LOG_TAG, "Error Occured, Skipping artist.. : " + err);
+                    Log.e(LOG_TAG, "Error occured getting Artist info...skipping : " + err);
+                    continue;
                 }
 
                 ArtistInfo currArtistInfo = new ArtistInfo(artistImageUrl,artistTextName,artistId);
