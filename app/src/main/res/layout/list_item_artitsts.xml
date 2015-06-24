@@ -10,6 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/list_item_artists_imageview"
+        android:minWidth="80dp"
+        android:minHeight="80dp"
         android:maxWidth="80dp"
         android:maxHeight="80dp"
         android:adjustViewBounds= "true"

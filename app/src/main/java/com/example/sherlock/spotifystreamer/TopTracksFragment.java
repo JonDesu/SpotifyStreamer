@@ -1,7 +1,6 @@
 package com.example.sherlock.spotifystreamer;
 
-import android.app.Activity;
-import android.content.Context;
+
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,12 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.example.sherlock.spotifystreamer.DataHelper.TrackInfo;
+import com.example.sherlock.spotifystreamer.DataHelper.TrackInfoAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +50,7 @@ public class TopTracksFragment extends Fragment {
             mArtistID = intent.getStringExtra(Intent.EXTRA_TEXT);
         }
 
-        ArrayList<TrackInfo> trackInfoList = new ArrayList<TrackInfo>();
+        ArrayList<TrackInfo> trackInfoList = new ArrayList<>();
 
         trackInfoAdapter = new TrackInfoAdapter(this.getActivity(),R.layout.list_item_tracks, trackInfoList);
 
@@ -68,74 +66,6 @@ public class TopTracksFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         TrackSearchTask trackSearchTask = new TrackSearchTask();
         trackSearchTask.execute(mArtistID);
-    }
-
-    public class TrackInfo {
-        public String iconUrl;
-        public String trackTitle;
-        public String albumName;
-
-        public TrackInfo(){
-            super();
-        }
-
-        public TrackInfo(String iconUrl, String trackTitle, String albumName) {
-            super();
-            this.iconUrl = iconUrl;
-            this.trackTitle = trackTitle;
-            this.albumName = albumName;
-        }
-    }
-
-    public class TrackInfoAdapter extends ArrayAdapter<TrackInfo> {
-
-        Context context;
-        int layoutResId;
-        ArrayList<TrackInfo> trackList;
-
-        public TrackInfoAdapter(Context context, int layoutResId,  ArrayList<TrackInfo> trackList) {
-            super(context, layoutResId, trackList);
-            this.layoutResId = layoutResId;
-            this.context = context;
-            this.trackList = trackList;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TrackInfoHolder holder = null;
-
-            if(convertView == null)
-            {
-                LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-                convertView = inflater.inflate(layoutResId, parent, false);
-
-                holder = new TrackInfoHolder();
-                holder.imageViewIcon = (ImageView)convertView.findViewById(R.id.list_item_artists_imageview);
-                holder.textViewAlbum = (TextView)convertView.findViewById(R.id.list_item_album_name_textview);
-                holder.textViewTrack = (TextView)convertView.findViewById(R.id.list_item_track_name_textview);
-
-                convertView.setTag(holder);
-            }
-            else
-            {
-                holder = (TrackInfoHolder) convertView.getTag();
-            }
-
-            TrackInfo trackInfo = trackList.get(position);
-            holder.textViewTrack.setText(trackInfo.trackTitle);
-            holder.textViewAlbum.setText(trackInfo.albumName);
-            Picasso.with(this.context).load(trackInfo.iconUrl).transform(new CircleTransform()).into(holder.imageViewIcon);
-
-
-            return convertView;
-        }
-
-        public class TrackInfoHolder
-        {
-            ImageView imageViewIcon;
-            TextView textViewTrack;
-            TextView textViewAlbum;
-        }
     }
 
     public class TrackSearchTask extends AsyncTask<String, Void, Tracks> {
@@ -169,6 +99,11 @@ public class TopTracksFragment extends Fragment {
 
             if (tracksResults == null) return;
 
+            if (tracksResults.tracks.size() == 0){
+                Toast.makeText(getActivity(), "No tracks listed for this artist...", Toast.LENGTH_SHORT).show();
+                getActivity().finish();
+            }
+
             List<Track> trackList = tracksResults.tracks;
 
             trackInfoAdapter.clear();
@@ -178,9 +113,14 @@ public class TopTracksFragment extends Fragment {
                 String trackName = "Unnamed";
                 String albumName = "UnknownAlbum";
 
-                albumImageUrl = trackList.get(i).album.images.get(0).url;
-                albumName = trackList.get(i).album.name;
-                trackName = trackList.get(i).name;
+                try {
+                    albumImageUrl = trackList.get(i).album.images.get(0).url;
+                    albumName = trackList.get(i).album.name;
+                    trackName = trackList.get(i).name;
+                }
+                catch(Exception err){
+                    Log.e(LOG_TAG, "Unknown Error: " + err.getMessage());
+                }
 
                 TrackInfo currArtistInfo = new TrackInfo(albumImageUrl,albumName,trackName);
                 trackInfoAdapter.add(currArtistInfo);

@@ -11,6 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/list_item_artists_imageview"
+        android:minWidth="80dp"
+        android:minHeight="80dp"
         android:maxWidth="80dp"
         android:maxHeight="80dp"
         android:adjustViewBounds= "true"
@@ -26,19 +28,22 @@
         android:layout_centerInParent="true"
         android:layout_toRightOf="@+id/list_item_artists_imageview">
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:id="@+id/list_item_track_name_textview"
-            android:layout_toRightOf="@+id/list_item_artists_imageview"
-            android:text="Test"
-            android:gravity="center_vertical">
-        </TextView>
+
 
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:id="@+id/list_item_album_name_textview"
             android:layout_toRightOf="@+id/list_item_artists_imageview"
             android:text="Test2"
+            android:gravity="center_vertical"
+            android:textStyle="bold">
+        </TextView>
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/list_item_track_name_textview"
+            android:layout_toRightOf="@+id/list_item_artists_imageview"
+            android:text="Test"
             android:gravity="center_vertical">
         </TextView>
 

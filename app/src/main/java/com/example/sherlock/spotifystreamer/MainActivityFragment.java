@@ -1,6 +1,5 @@
 package com.example.sherlock.spotifystreamer;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -14,14 +13,13 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.example.sherlock.spotifystreamer.DataHelper.ArtistInfo;
+import com.example.sherlock.spotifystreamer.DataHelper.ArtistInfoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +75,7 @@ public class MainActivityFragment extends Fragment {
                 }
         );
 
-        ArrayList<ArtistInfo> artistInfoList = new ArrayList<ArtistInfo>();
+        ArrayList<ArtistInfo> artistInfoList = new ArrayList<>();
 
         mAdapter = new ArtistInfoAdapter(this.getActivity(),R.layout.list_item_artitsts, artistInfoList);
 
@@ -96,69 +94,6 @@ public class MainActivityFragment extends Fragment {
         });
 
         return rootView;
-    }
-
-    public class ArtistInfo {
-        public String iconUrl;
-        public String title;
-        public String id;
-        public ArtistInfo(){
-            super();
-        }
-
-        public ArtistInfo(String iconUrl, String title, String id) {
-            super();
-            this.iconUrl = iconUrl;
-            this.title = title;
-            this.id = id;
-        }
-    }
-
-    public class ArtistInfoAdapter extends ArrayAdapter<ArtistInfo> {
-
-        Context context;
-        int layoutResId;
-        ArrayList<ArtistInfo> artistList;
-
-        public ArtistInfoAdapter(Context context, int layoutResId,  ArrayList<ArtistInfo> artistList) {
-            super(context, layoutResId, artistList);
-            this.layoutResId = layoutResId;
-            this.context = context;
-            this.artistList = artistList;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ArtistInfoHolder holder = null;
-
-            if(convertView == null)
-            {
-                LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-                convertView = inflater.inflate(layoutResId, parent, false);
-
-                holder = new ArtistInfoHolder();
-                holder.imageIcon = (ImageView)convertView.findViewById(R.id.list_item_artists_imageview);
-                holder.textName = (TextView)convertView.findViewById(R.id.list_item_artists_textview);
-                convertView.setTag(holder);
-            }
-            else
-            {
-                holder = (ArtistInfoHolder) convertView.getTag();
-            }
-
-            ArtistInfo artistInfo = artistList.get(position);
-            holder.textName.setText(artistInfo.title);
-            Picasso.with(this.context).load(artistInfo.iconUrl).transform(new CircleTransform()).into(holder.imageIcon);
-
-
-            return convertView;
-        }
-
-        public class ArtistInfoHolder
-        {
-            ImageView imageIcon;
-            TextView textName;
-        }
     }
 
     public class SpotifySearchTask extends AsyncTask<String, Void, ArtistsPager> {
@@ -190,7 +125,7 @@ public class MainActivityFragment extends Fragment {
             if (artistPagerResults == null) return;
 
             if (artistPagerResults.artists.total == 0){
-                Toast.makeText(getActivity(), "No Artists found..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "No Artists found.. Perhaps a different search?", Toast.LENGTH_SHORT).show();
                 return;
             }
 
