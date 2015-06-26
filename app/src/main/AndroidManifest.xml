@@ -4,6 +4,8 @@
 
     <!-- required to access the internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -11,7 +13,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name" >
             <intent-filter>
@@ -21,13 +23,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TopTracksActivity"
-            android:label="@string/title_activity_top_tracks"
+            android:name=".activity.TopTracksActivity"
             android:configChanges="orientation|screenSize"
-            android:parentActivityName=".MainActivity" >
+            android:label="@string/title_activity_top_tracks"
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.sherlock.spotifystreamer.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
     </application>
 

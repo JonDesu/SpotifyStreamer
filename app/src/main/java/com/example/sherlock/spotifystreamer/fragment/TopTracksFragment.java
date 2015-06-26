@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer;
+package com.example.sherlock.spotifystreamer.fragment;
 
 
 import android.content.Intent;
@@ -12,8 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.sherlock.spotifystreamer.DataHelper.TrackInfo;
-import com.example.sherlock.spotifystreamer.DataHelper.TrackInfoAdapter;
+import com.example.sherlock.spotifystreamer.R;
+import com.example.sherlock.spotifystreamer.adapter.TrackInfoAdapter;
+import com.example.sherlock.spotifystreamer.model.TrackInfo;
+import com.example.sherlock.spotifystreamer.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +45,11 @@ public class TopTracksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if (!Utilities.NetworkAvailable(getActivity())) {
+            Toast.makeText(getActivity(), getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+            getActivity().finish();
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_top_tracks, container, false);
 
         Intent intent = getActivity().getIntent();
@@ -64,6 +71,7 @@ public class TopTracksFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+
         TrackSearchTask trackSearchTask = new TrackSearchTask();
         trackSearchTask.execute(mArtistID);
     }
@@ -109,7 +117,7 @@ public class TopTracksFragment extends Fragment {
             trackInfoAdapter.clear();
             for (int i = 0; i < trackList.size(); i++) {
 
-                String albumImageUrl = "http://cdn.embed.ly/providers/logos/spotify.png";
+                String albumImageUrl = null;
                 String trackName = "Unnamed";
                 String albumName = "UnknownAlbum";
 

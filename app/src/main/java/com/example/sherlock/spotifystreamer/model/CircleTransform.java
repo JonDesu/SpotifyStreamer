@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer;
+package com.example.sherlock.spotifystreamer.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
@@ -11,7 +11,6 @@ import com.squareup.picasso.Transformation;
  * Created by Jon on 6/22/15.
  * Uses snippet from https://gist.github.com/julianshen/5829333
  */
-
 
 public class CircleTransform implements Transformation {
     @Override

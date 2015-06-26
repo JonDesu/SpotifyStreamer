@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer;
+package com.example.sherlock.spotifystreamer.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,8 +18,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.sherlock.spotifystreamer.DataHelper.ArtistInfo;
-import com.example.sherlock.spotifystreamer.DataHelper.ArtistInfoAdapter;
+import com.example.sherlock.spotifystreamer.R;
+import com.example.sherlock.spotifystreamer.activity.TopTracksActivity;
+import com.example.sherlock.spotifystreamer.adapter.ArtistInfoAdapter;
+import com.example.sherlock.spotifystreamer.model.ArtistInfo;
+import com.example.sherlock.spotifystreamer.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +38,8 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  */
 public class MainActivityFragment extends Fragment {
 
+    private final String LOG_TAG = ArtistSearchTask.class.getSimpleName();
     private ArtistInfoAdapter mAdapter;
-    private final String LOG_TAG = SpotifySearchTask.class.getSimpleName();
 
     public MainActivityFragment() {
     }
@@ -61,8 +64,13 @@ public class MainActivityFragment extends Fragment {
 
                             if (searchString.equals("")) return true;
 
+                            if (!Utilities.NetworkAvailable(getActivity())) {
+                                Toast.makeText(getActivity(), getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+                                return true;
+                            }
+
                             Log.i(LOG_TAG, "Searching for artist : " + searchString);
-                            SpotifySearchTask spotSearch = new SpotifySearchTask();
+                            ArtistSearchTask spotSearch = new ArtistSearchTask();
                             spotSearch.execute(searchString);
 
                             InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -96,9 +104,10 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-    public class SpotifySearchTask extends AsyncTask<String, Void, ArtistsPager> {
 
-        private final String LOG_TAG = SpotifySearchTask.class.getSimpleName();
+    public class ArtistSearchTask extends AsyncTask<String, Void, ArtistsPager> {
+
+        private final String LOG_TAG = ArtistSearchTask.class.getSimpleName();
 
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService spotifyService = spotifyApi.getService();
@@ -153,6 +162,8 @@ public class MainActivityFragment extends Fragment {
                 ArtistInfo currArtistInfo = new ArtistInfo(artistImageUrl,artistTextName,artistId);
                 mAdapter.add(currArtistInfo);
             }
+
+            artistList.clear();
             mAdapter.notifyDataSetChanged();
         }
     }
