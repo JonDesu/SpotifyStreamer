@@ -37,40 +37,42 @@ public class ArtistInfoAdapter extends ArrayAdapter<ArtistInfo> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ArtistInfoHolder holder;
+        final ArtistInfoHolder holder;
 
         if (convertView == null) {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             convertView = inflater.inflate(layoutResId, parent, false);
 
             holder = new ArtistInfoHolder();
-            holder.imageIcon = (ImageView) convertView.findViewById(R.id.list_item_artists_imageview);
-            holder.textName = (TextView) convertView.findViewById(R.id.list_item_artists_textview);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.list_item_artists_imageview);
+            holder.textView = (TextView) convertView.findViewById(R.id.list_item_artists_textview);
             convertView.setTag(holder);
         } else {
             holder = (ArtistInfoHolder) convertView.getTag();
         }
 
+        final View root = convertView.findViewById(R.id.list_item_artists_imageview);
         ArtistInfo artistInfo = artistList.get(position);
-        holder.textName.setText(artistInfo.title);
+        holder.textView.setText(artistInfo.title);
 
         if (Patterns.WEB_URL.matcher(artistInfo.iconUrl).matches()) {
             Picasso.with(this.context)
                     .load(artistInfo.iconUrl)
+                    .placeholder(R.drawable.default_icon_spotify)
                     .transform(new CircleTransform())
-                    .into(holder.imageIcon);
+                    .into(holder.imageView);
         } else {
             Picasso.with(this.context)
                     .load(R.drawable.default_icon_spotify)
                     .transform(new CircleTransform())
-                    .into(holder.imageIcon);
+                    .into(holder.imageView);
         }
 
         return convertView;
     }
 
     public class ArtistInfoHolder {
-        ImageView imageIcon;
-        TextView textName;
+        ImageView imageView;
+        TextView textView;
     }
 }

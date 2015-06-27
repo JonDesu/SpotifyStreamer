@@ -61,6 +61,7 @@ public class TrackInfoAdapter extends ArrayAdapter<TrackInfo> {
         if (Patterns.WEB_URL.matcher(trackInfo.iconUrl).matches()) {
             Picasso.with(this.context)
                     .load(trackInfo.iconUrl)
+                    .placeholder(R.drawable.default_icon_spotify)
                     .transform(new CircleTransform())
                     .into(holder.imageViewIcon);
         } else {

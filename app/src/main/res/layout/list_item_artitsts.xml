@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_item_artists_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/list_item_artists_layout">
+    android:layout_height="match_parent">
 
 
     <ImageView
+        android:id="@+id/list_item_artists_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/list_item_artists_imageview"
-        android:minWidth="80dp"
-        android:minHeight="80dp"
-        android:maxWidth="80dp"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
         android:maxHeight="80dp"
-        android:adjustViewBounds= "true"
+        android:maxWidth="80dp"
+        android:minHeight="80dp"
+        android:minWidth="80dp"
         android:padding="6dp"
-        android:paddingRight="6dp"
-        android:layout_gravity="center"/>
+        android:paddingRight="6dp" />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:gravity="center_vertical"
-    android:id="@+id/list_item_artists_textview"
-        android:layout_gravity="center_vertical">
+        android:id="@+id/list_item_artists_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeight">
 
 
 

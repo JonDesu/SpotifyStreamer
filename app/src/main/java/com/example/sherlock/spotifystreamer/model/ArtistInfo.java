@@ -9,7 +9,6 @@ public class ArtistInfo {
     public String id;
 
     public ArtistInfo(String iconUrl, String title, String id) {
-        super();
         this.iconUrl = iconUrl;
         this.title = title;
         this.id = id;

@@ -9,7 +9,6 @@ public class TrackInfo {
     public String albumName;
 
     public TrackInfo(String iconUrl, String trackTitle, String albumName) {
-        super();
         this.iconUrl = iconUrl;
         this.trackTitle = trackTitle;
         this.albumName = albumName;
