@@ -22,6 +22,7 @@ public class TrackInfo implements Parcelable{
         mAlbumName = track.album.name;
         mTrackTitle = track.name;
         mTrackUrl = track.preview_url;
+        mArtistName = track.artists.get(0).name;
         mId = track.id;
         if (track.external_urls != null) {
             mExternalUrl = track.external_urls.get("spotify");

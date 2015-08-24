@@ -112,6 +112,7 @@ public class PlayFragment extends DialogFragment {
         if (imageView != null) {
             Picasso.with(getActivity())
                     .load(mService.getCurrentTrack().getIconUrl())
+                    .fit().centerCrop()
                     .into(imageView);
         }
         // Setting the play/pause button
@@ -123,11 +124,13 @@ public class PlayFragment extends DialogFragment {
         // Setting the seekBar and progressBar
         if (mIsServiceBound && mService.isPrepared()) {
             progressBar.setVisibility(View.GONE);
+            imageView.setVisibility(View.VISIBLE);
             if (mSeekbarHandler == null) {
                 setSeekBar();
             }
         } else {
             progressBar.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.INVISIBLE);
             if (mSeekbarHandler != null) {
                 mSeekbarHandler.removeCallbacks(seekBarRunnable);
             }
