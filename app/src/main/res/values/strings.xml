@@ -1,6 +1,22 @@
 <resources>
-    <string name="app_name">SpotifyStreamer</string>
+    <string name="app_name">Spotify Streamer</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_top_tracks">TopTracksActivity</string>
+    <string name="current_track">Current Track</string>
+    <string name="title_activity_top_tracks">Top 10 Tracks</string>
     <string name="no_internet">No Internet Connection Available</string>
-    </resources>
+    <string name="title_activity_player">PlayerActivity</string>
+
+    <string name="preferred_country_key">country</string>
+    <string name="preferred_country_default">US</string>
+    <string name="preferred_country_label">Country</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <string name="artist_description">Artist Thumbnail</string>
+    <string name="album_description">Album Thumbnail</string>
+
+    <string name="track_missing">Track Not Found</string>
+
+    <string name="zero_mark">"00:00"</string>
+
+
+</resources>

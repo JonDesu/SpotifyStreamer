@@ -1,7 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:id="@+id/fragment_main"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-    tools:context="com.example.sherlock.spotifystreamer.activity.MainActivity"
-tools:ignore="MergeRootFrame"/>
+<fragment
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_main"
+    android:name="com.example.sherlock.spotifystreamer.fragment.MainActivityFragment"
+    tools:layout="@layout/fragment_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />

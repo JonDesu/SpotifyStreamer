@@ -8,7 +8,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/searchText"
+        android:id="@+id/search_text_artists"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:hint="Search for artist..."
@@ -18,7 +18,14 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/artistResultListView"
-        android:layout_below="@+id/searchText"
+        android:id="@+id/listview_artists"
+        android:layout_below="@+id/search_text_artists"
         android:layout_centerHorizontal="true" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar_artists"
+        style="@style/ProgressBar"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal" />
+
 </RelativeLayout>

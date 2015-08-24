@@ -1,12 +1,18 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.sherlock.spotifystreamer.fragment.TopTracksFragment">
 
+    <ProgressBar
+        android:id="@+id/progress_bar_track"
+        style="@style/ProgressBar"
+        android:layout_alignParentTop="true"
+        android:visibility="gone" />
+
     <ListView
-        android:id="@+id/trackResultsListView"
+        android:id="@+id/listview_tracks"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true" />
 
-</FrameLayout>
+</RelativeLayout>

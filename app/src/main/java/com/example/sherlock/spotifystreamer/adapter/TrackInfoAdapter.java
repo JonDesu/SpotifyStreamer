@@ -2,7 +2,6 @@ package com.example.sherlock.spotifystreamer.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,10 @@ import com.example.sherlock.spotifystreamer.model.CircleTransform;
 import com.example.sherlock.spotifystreamer.model.TrackInfo;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 /**
  * Created by Jon on 6/25/15.
@@ -25,58 +27,61 @@ public class TrackInfoAdapter extends ArrayAdapter<TrackInfo> {
     private final String LOG_TAG = ArtistInfoAdapter.class.getSimpleName();
 
     Context context;
-    int layoutResId;
-    ArrayList<TrackInfo> trackList;
+    int layoutResourceId;
+    List<TrackInfo> objects;
 
-    public TrackInfoAdapter(Context context, int layoutResId, ArrayList<TrackInfo> trackList) {
-        super(context, layoutResId, trackList);
-        this.layoutResId = layoutResId;
+    public TrackInfoAdapter(Context context, int layoutResourceId, List<TrackInfo> objects) {
+        super(context, layoutResourceId, objects);
         this.context = context;
-        this.trackList = trackList;
+        this.layoutResourceId = layoutResourceId;
+        this.objects = objects;
+    }
+
+    static class ViewHolder {
+
+        @InjectView(R.id.list_item_track_name_textview) TextView textViewTrack;
+        @InjectView(R.id.list_item_album_name_textview) TextView textViewAlbum;
+        @InjectView(R.id.list_item_track_imageview) ImageView imageView;
+
+        public ViewHolder(View view) {
+            ButterKnife.inject(this, view);
+        }
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        TrackInfoHolder holder;
+
+        ViewHolder viewHolder;
 
         if (convertView == null) {
+            // Inflating the layout
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            convertView = inflater.inflate(layoutResId, parent, false);
+            convertView = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = new TrackInfoHolder();
-            holder.imageViewIcon = (ImageView) convertView.findViewById(R.id.list_item_artists_imageview);
-            holder.textViewAlbum = (TextView) convertView.findViewById(R.id.list_item_album_name_textview);
-            holder.textViewTrack = (TextView) convertView.findViewById(R.id.list_item_track_name_textview);
-
-            convertView.setTag(holder);
-        } else {
-            holder = (TrackInfoHolder) convertView.getTag();
+            // Setting viewholder
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        }else{
+            // Getting back info from the viewHolder
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        TrackInfo trackInfo = trackList.get(position);
-        holder.textViewTrack.setText(trackInfo.trackTitle);
-        holder.textViewAlbum.setText(trackInfo.albumName);
+        TrackInfo trackItem = objects.get(position);
 
-
-        if (Patterns.WEB_URL.matcher(trackInfo.iconUrl).matches()) {
-            Picasso.with(this.context)
-                    .load(trackInfo.iconUrl)
-                    .placeholder(R.drawable.default_icon_spotify)
-                    .transform(new CircleTransform())
-                    .into(holder.imageViewIcon);
-        } else {
-            Picasso.with(this.context)
-                    .load(R.drawable.default_icon_spotify)
-                    .transform(new CircleTransform())
-                    .into(holder.imageViewIcon);
+        if (trackItem != null) {
+            viewHolder.textViewTrack.setText(trackItem.getTrackTitle());
+            viewHolder.textViewAlbum.setText(trackItem.getAlbumName());
+            // Don't load the image again if it was already fetched
+            if (viewHolder.imageView != null) {
+                Picasso.with(getContext())
+                        .load(trackItem.getIconUrl())
+                        .transform(new CircleTransform())
+                        .placeholder(R.drawable.default_icon_spotify)
+                        .error(R.drawable.default_icon_spotify)
+                        .into(viewHolder.imageView);
+            }
         }
 
         return convertView;
-    }
-
-    public class TrackInfoHolder {
-        ImageView imageViewIcon;
-        TextView textViewTrack;
-        TextView textViewAlbum;
     }
 }

@@ -2,7 +2,6 @@ package com.example.sherlock.spotifystreamer.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,10 @@ import com.example.sherlock.spotifystreamer.model.ArtistInfo;
 import com.example.sherlock.spotifystreamer.model.CircleTransform;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 /**
  * Created by Jon on 6/25/15.
@@ -24,55 +26,59 @@ public class ArtistInfoAdapter extends ArrayAdapter<ArtistInfo> {
 
     private final String LOG_TAG = ArtistInfoAdapter.class.getSimpleName();
 
-    Context context;
-    int layoutResId;
-    ArrayList<ArtistInfo> artistList;
+    private Context context;
+    private int layoutResourceId;
+    private List<ArtistInfo> objects;
 
-    public ArtistInfoAdapter(Context context, int layoutResId, ArrayList<ArtistInfo> artistList) {
-        super(context, layoutResId, artistList);
-        this.layoutResId = layoutResId;
+    public ArtistInfoAdapter(Context context, int layoutResourceId, List <ArtistInfo> objects) {
+        super(context, layoutResourceId, objects);
         this.context = context;
-        this.artistList = artistList;
+        this.layoutResourceId = layoutResourceId;
+        this.objects = objects;
     }
 
+    static class ViewHolder {
+
+        @InjectView(R.id.list_item_artists_textview) TextView textView;
+        @InjectView(R.id.list_item_artists_imageview) ImageView imageView;
+
+        public ViewHolder(View view) {
+            ButterKnife.inject(this, view);
+        }
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ArtistInfoHolder holder;
+
+        ViewHolder viewHolder;
 
         if (convertView == null) {
+            // Inflating the layout
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            convertView = inflater.inflate(layoutResId, parent, false);
+            convertView = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = new ArtistInfoHolder();
-            holder.imageView = (ImageView) convertView.findViewById(R.id.list_item_artists_imageview);
-            holder.textView = (TextView) convertView.findViewById(R.id.list_item_artists_textview);
-            convertView.setTag(holder);
-        } else {
-            holder = (ArtistInfoHolder) convertView.getTag();
+            // Setting viewholder
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        }else{
+            // Getting back info from the viewHolder
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final View root = convertView.findViewById(R.id.list_item_artists_imageview);
-        ArtistInfo artistInfo = artistList.get(position);
-        holder.textView.setText(artistInfo.title);
+        ArtistInfo artistInfo = objects.get(position);
 
-        if (Patterns.WEB_URL.matcher(artistInfo.iconUrl).matches()) {
-            Picasso.with(this.context)
-                    .load(artistInfo.iconUrl)
-                    .placeholder(R.drawable.default_icon_spotify)
-                    .transform(new CircleTransform())
-                    .into(holder.imageView);
-        } else {
-            Picasso.with(this.context)
-                    .load(R.drawable.default_icon_spotify)
-                    .transform(new CircleTransform())
-                    .into(holder.imageView);
+        if (artistInfo != null) {
+            viewHolder.textView.setText(artistInfo.getName());
+            // Don't load the image again if it was already fetched
+            if (viewHolder.imageView != null) {
+                Picasso.with(getContext())
+                        .load(artistInfo.getIconUrl())
+                        .transform(new CircleTransform())
+                        .placeholder(R.drawable.default_icon_spotify)
+                        .error(R.drawable.default_icon_spotify)
+                        .into(viewHolder.imageView);
+            }
         }
 
         return convertView;
-    }
-
-    public class ArtistInfoHolder {
-        ImageView imageView;
-        TextView textView;
     }
 }

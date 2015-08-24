@@ -1,7 +1,6 @@
 package com.example.sherlock.spotifystreamer.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,18 +14,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.activity.TopTracksActivity;
 import com.example.sherlock.spotifystreamer.adapter.ArtistInfoAdapter;
 import com.example.sherlock.spotifystreamer.model.ArtistInfo;
 import com.example.sherlock.spotifystreamer.utilities.Utilities;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
@@ -38,23 +38,42 @@ import kaaes.spotify.webapi.android.models.ArtistsPager;
  */
 public class MainActivityFragment extends Fragment {
 
-    private final String LOG_TAG = ArtistSearchTask.class.getSimpleName();
-    private ArtistInfoAdapter mAdapter;
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
-    public MainActivityFragment() {
+    private ArrayList<ArtistInfo> mArtistInfoList = new ArrayList<>();
+    private ArtistInfoAdapter mAdapter;
+    private int mPosition = ListView.INVALID_POSITION;
+    private static final String ARTIST_POSITION_KEY = "ARTIST_POSITION_KEY";
+    private static final String ARTIST_INFO_LIST_KEY = "ARTIST_INFO_LIST_KEY";
+
+    @InjectView(R.id.listview_artists) ListView listView;
+    @InjectView(R.id.progress_bar_artists) ProgressBar progressBarArtist;
+    @InjectView(R.id.search_text_artists) EditText searchEditText;
+
+    public interface Callback {
+        void onArtistItemSelected(ArtistInfo artistInfo);
+    }
+
+    @Override
+    public void onCreate (Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null &&
+                savedInstanceState.containsKey(ARTIST_INFO_LIST_KEY) &&
+                savedInstanceState.containsKey(ARTIST_POSITION_KEY)) {
+            mArtistInfoList = savedInstanceState.getParcelableArrayList(ARTIST_INFO_LIST_KEY);
+            mPosition = savedInstanceState.getInt(ARTIST_POSITION_KEY);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        final EditText searchEditText;
-
+        // Inflating the layout
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.inject(this, rootView);
 
-        searchEditText = (EditText) rootView.findViewById(R.id.searchText);
-
-        searchEditText.setOnEditorActionListener(
+                searchEditText.setOnEditorActionListener(
                 new EditText.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -62,16 +81,11 @@ public class MainActivityFragment extends Fragment {
                             // your action here
                             String searchString = searchEditText.getText().toString();
 
+                            //Nothing was entered into search text
                             if (searchString.equals("")) return true;
 
-                            if (!Utilities.NetworkAvailable(getActivity())) {
-                                Toast.makeText(getActivity(), getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
-                                return true;
-                            }
-
                             Log.i(LOG_TAG, "Searching for artist : " + searchString);
-                            ArtistSearchTask spotSearch = new ArtistSearchTask();
-                            spotSearch.execute(searchString);
+                            searchForArtists(searchString);
 
                             InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(searchEditText.getWindowToken(),
@@ -83,87 +97,89 @@ public class MainActivityFragment extends Fragment {
                 }
         );
 
-        ArrayList<ArtistInfo> artistInfoList = new ArrayList<>();
-
-        mAdapter = new ArtistInfoAdapter(this.getActivity(),R.layout.list_item_artitsts, artistInfoList);
+        mAdapter = new ArtistInfoAdapter(this.getActivity(),R.layout.list_item_artists, mArtistInfoList);
 
         //Reference to listview, and attach adapter
-        ListView listView = (ListView) rootView.findViewById(R.id.artistResultListView);
         listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                ArtistInfo selectedArtist = mAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), TopTracksActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, selectedArtist.id);
-                startActivity(intent);
-            }
-        });
+        listView.smoothScrollToPosition(mPosition);
+        listView.setOnItemClickListener(onArtistItemClickListener);
 
         return rootView;
     }
 
+    // Saving the current parcelable item list
+    @Override
+    public void onSaveInstanceState(Bundle savedState) {
+        super.onSaveInstanceState(savedState);
+        savedState.putParcelableArrayList(ARTIST_INFO_LIST_KEY, mArtistInfoList);
+        savedState.putInt(ARTIST_POSITION_KEY, mPosition);
+    }
+
+    // When the user clicks on an item the activity starts a new intent.
+    private AdapterView.OnItemClickListener onArtistItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            ArtistInfo artistInfo = mAdapter.getItem(position);
+            ((Callback) getActivity()).onArtistItemSelected(artistInfo);
+            mPosition = position;
+        }
+    };
+
+    public void searchForArtists(String artist) {
+        mAdapter.clear();
+        if (Utilities.NetworkAvailable(getActivity())) {
+            ArtistSearchTask artistSearchTask = new ArtistSearchTask();
+            artistSearchTask.execute(artist);
+        } else {
+            Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+            //textViewMessage.setText(R.string.no_internet);
+        }
+    }
 
     public class ArtistSearchTask extends AsyncTask<String, Void, ArtistsPager> {
 
         private final String LOG_TAG = ArtistSearchTask.class.getSimpleName();
 
-        SpotifyApi spotifyApi = new SpotifyApi();
-        SpotifyService spotifyService = spotifyApi.getService();
+        @Override
+        protected void onPreExecute() {
+            // Clearing the list, showing the progress bar and hiding the msg
+            progressBarArtist.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected ArtistsPager doInBackground(String... params) {
 
+            // If no valid input is available...
+            if (params.length == 0 || "".equals(params[0])) return null;
+
             String inputArtist = params[0];
-            ArtistsPager resPager = null;
+
+            SpotifyApi spotifyApi = new SpotifyApi();
+            SpotifyService spotifyService = spotifyApi.getService();
 
             try{
-                 resPager = spotifyService.searchArtists(inputArtist);
+                 return spotifyService.searchArtists(inputArtist);
             }
             catch(Exception err){
                 Log.e(LOG_TAG, "Unknown Error: " + err.getMessage());
             }
-
-            return resPager;
+            return null;
         }
 
         @Override
         protected void onPostExecute(ArtistsPager artistPagerResults) {
-
+            progressBarArtist.setVisibility(View.GONE);
             if (artistPagerResults == null) return;
 
-            if (artistPagerResults.artists.total == 0){
+            if (artistPagerResults.artists.total < 1){
                 Toast.makeText(getActivity(), "No Artists found.. Perhaps a different search?", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            List<Artist> artistList = artistPagerResults.artists.items;
-
-            mAdapter.clear();
-            for (int i = 0; i < artistList.size(); i++) {
-
-                if(artistList.get(i).images.size() == 0) continue;
-
-                String artistImageUrl;
-                String artistTextName;
-                String artistId;
-
-                try{
-                    artistImageUrl = artistList.get(i).images.get(0).url;
-                    artistTextName = artistList.get(i).name;
-                    artistId = artistList.get(i).id;
-                }
-                catch(Exception err){
-                    Log.e(LOG_TAG, "Error occured getting Artist info...skipping : " + err);
-                    continue;
-                }
-
-                ArtistInfo currArtistInfo = new ArtistInfo(artistImageUrl,artistTextName,artistId);
-                mAdapter.add(currArtistInfo);
+            for(Artist artist : artistPagerResults.artists.items) {
+                mArtistInfoList.add(new ArtistInfo(artist));
             }
 
-            artistList.clear();
             mAdapter.notifyDataSetChanged();
         }
     }
