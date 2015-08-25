@@ -28,11 +28,9 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyError;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
-import retrofit.RetrofitError;
 
 
 /**
@@ -90,7 +88,7 @@ public class TopTracksFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Restoring the ListView (if the activity has been re-created)
         if (savedInstanceState == null || !savedInstanceState.containsKey(TRACK_INFO_LIST_KEY)) {
-            mTrackInfoList = new ArrayList<TrackInfo>();
+            mTrackInfoList = new ArrayList<>();
         } else {
             mTrackInfoList = savedInstanceState.getParcelableArrayList(TRACK_INFO_LIST_KEY);
             mSavedInstanceFlag = true;
@@ -142,7 +140,6 @@ public class TopTracksFragment extends Fragment {
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Set the titlebar subtitle with the mArtistName
         // AppCompatActivity is used instead of ActionBarActivity http://stackoverflow.com/a/18320838/4836602
         ((AppCompatActivity)getActivity()).getSupportActionBar().setSubtitle(mArtistName);
         if (mArtistID != null && !mSavedInstanceFlag) {
@@ -185,10 +182,8 @@ public class TopTracksFragment extends Fragment {
                 Map<String, Object> options = new HashMap<>();
                 options.put("country", Utilities.getCountry(getActivity()));
                 return spotify.getArtistTopTrack(track, options);
-            } catch (RetrofitError error) {
-                SpotifyError spotifyError = SpotifyError.fromRetrofitError(error);
-                Log.e(LOG_TAG, spotifyError.getErrorDetails().message);
-                spotifyError.printStackTrace();
+            } catch (Exception err) {
+                Log.e(LOG_TAG, err.getMessage());
             }
             return null;
         }
