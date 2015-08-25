@@ -17,10 +17,10 @@ import android.widget.Toast;
 
 import com.example.sherlock.spotifystreamer.Player.PlayFragment;
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.Services.MusicService;
 import com.example.sherlock.spotifystreamer.Settings.SettingsActivity;
 import com.example.sherlock.spotifystreamer.TopTracks.TopTracksActivity;
 import com.example.sherlock.spotifystreamer.TopTracks.TopTracksFragment;
+
 
 
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback{
@@ -29,13 +29,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     private boolean mTabletModeActive;
     private MainActivityFragment mainActivityFragment;
-    private MusicService mMusicService;
+    private com.example.sherlock.spotifystreamer.Services.MusicService mMusicService;
     private boolean mIsServiceBound = false;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
 
-            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+            com.example.sherlock.spotifystreamer.Services.MusicService.MusicBinder binder = (com.example.sherlock.spotifystreamer.Services.MusicService.MusicBinder) service;
             mMusicService = binder.getService();
             mIsServiceBound = true;
         }
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     protected void onStart() {
         super.onStart();
 
-        Intent intent = new Intent(this, MusicService.class);
+        Intent intent = new Intent(this, com.example.sherlock.spotifystreamer.Services.MusicService.class);
         startService(intent);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         }
     }
 
-    public MusicService getMusicService() {
+    public com.example.sherlock.spotifystreamer.Services.MusicService getMusicService() {
         return mMusicService;
     }
 
