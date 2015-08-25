@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.fragment;
+package com.example.sherlock.spotifystreamer.ArtistSearch;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -19,9 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.adapter.ArtistInfoAdapter;
-import com.example.sherlock.spotifystreamer.model.ArtistInfo;
-import com.example.sherlock.spotifystreamer.utilities.Utilities;
+import com.example.sherlock.spotifystreamer.Utilities.Utilities;
 
 import java.util.ArrayList;
 
@@ -32,27 +30,25 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 
-
-/**
- * A placeholder fragment containing a simple view.
- */
 public class MainActivityFragment extends Fragment {
 
-    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
-
-    private ArrayList<ArtistInfo> mArtistInfoList = new ArrayList<>();
-    private ArtistInfoAdapter mAdapter;
-    private int mPosition = ListView.INVALID_POSITION;
     private static final String ARTIST_POSITION_KEY = "ARTIST_POSITION_KEY";
     private static final String ARTIST_INFO_LIST_KEY = "ARTIST_INFO_LIST_KEY";
-
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     @InjectView(R.id.listview_artists) ListView listView;
     @InjectView(R.id.progress_bar_artists) ProgressBar progressBarArtist;
     @InjectView(R.id.search_text_artists) EditText searchEditText;
-
-    public interface Callback {
-        void onArtistItemSelected(ArtistInfo artistInfo);
-    }
+    private ArrayList<ArtistInfo> mArtistInfoList = new ArrayList<>();
+    private ArtistInfoAdapter mAdapter;
+    private int mPosition = ListView.INVALID_POSITION;
+    private AdapterView.OnItemClickListener onArtistItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            ArtistInfo artistInfo = mAdapter.getItem(position);
+            ((Callback) getActivity()).onArtistItemSelected(artistInfo);
+            mPosition = position;
+        }
+    };
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -69,7 +65,6 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Inflating the layout
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.inject(this, rootView);
 
@@ -78,10 +73,9 @@ public class MainActivityFragment extends Fragment {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                            // your action here
+
                             String searchString = searchEditText.getText().toString();
 
-                            //Nothing was entered into search text
                             if (searchString.equals("")) return true;
 
                             Log.i(LOG_TAG, "Searching for artist : " + searchString);
@@ -99,7 +93,6 @@ public class MainActivityFragment extends Fragment {
 
         mAdapter = new ArtistInfoAdapter(this.getActivity(),R.layout.list_item_artists, mArtistInfoList);
 
-        //Reference to listview, and attach adapter
         listView.setAdapter(mAdapter);
         listView.smoothScrollToPosition(mPosition);
         listView.setOnItemClickListener(onArtistItemClickListener);
@@ -107,23 +100,13 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-    // Saving the current parcelable item list
+
     @Override
     public void onSaveInstanceState(Bundle savedState) {
         super.onSaveInstanceState(savedState);
         savedState.putParcelableArrayList(ARTIST_INFO_LIST_KEY, mArtistInfoList);
         savedState.putInt(ARTIST_POSITION_KEY, mPosition);
     }
-
-    // When the user clicks on an item the activity starts a new intent.
-    private AdapterView.OnItemClickListener onArtistItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            ArtistInfo artistInfo = mAdapter.getItem(position);
-            ((Callback) getActivity()).onArtistItemSelected(artistInfo);
-            mPosition = position;
-        }
-    };
 
     public void searchForArtists(String artist) {
         mAdapter.clear();
@@ -132,8 +115,11 @@ public class MainActivityFragment extends Fragment {
             artistSearchTask.execute(artist);
         } else {
             Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
-            //textViewMessage.setText(R.string.no_internet);
         }
+    }
+
+    public interface Callback {
+        void onArtistItemSelected(ArtistInfo artistInfo);
     }
 
     public class ArtistSearchTask extends AsyncTask<String, Void, ArtistsPager> {
@@ -142,14 +128,12 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            // Clearing the list, showing the progress bar and hiding the msg
             progressBarArtist.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected ArtistsPager doInBackground(String... params) {
 
-            // If no valid input is available...
             if (params.length == 0 || "".equals(params[0])) return null;
 
             String inputArtist = params[0];

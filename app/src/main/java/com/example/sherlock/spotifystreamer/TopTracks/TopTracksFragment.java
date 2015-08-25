@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.fragment;
+package com.example.sherlock.spotifystreamer.TopTracks;
 
 
 import android.os.AsyncTask;
@@ -15,13 +15,11 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.sherlock.spotifystreamer.ArtistSearch.ArtistInfo;
+import com.example.sherlock.spotifystreamer.ArtistSearch.MainActivity;
+import com.example.sherlock.spotifystreamer.Player.PlayFragment;
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.activity.MainActivity;
-import com.example.sherlock.spotifystreamer.activity.TopTracksActivity;
-import com.example.sherlock.spotifystreamer.adapter.TrackInfoAdapter;
-import com.example.sherlock.spotifystreamer.model.ArtistInfo;
-import com.example.sherlock.spotifystreamer.model.TrackInfo;
-import com.example.sherlock.spotifystreamer.utilities.Utilities;
+import com.example.sherlock.spotifystreamer.Utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,20 +40,49 @@ import retrofit.RetrofitError;
  */
 public class TopTracksFragment extends Fragment {
 
+    public static final String TRACK_ARTIST_ITEM_KEY = "TRACK_ARTIST_ITEM_KEY";
+    private static final String TRACK_INFO_LIST_KEY = "TRACK_INFO_LIST_KEY";
+    private static final String TRACK_POSITION_KEY = "TRACK_POSITION_KEY";
     private final String LOG_TAG = TrackSearchTask.class.getSimpleName();
+    @InjectView(R.id.progress_bar_track)
+    ProgressBar progressBarTrack;
+    @InjectView(R.id.listview_tracks)
+    ListView listView;
     private String mArtistID;
     private String mArtistName;
     private TrackInfoAdapter mTrackInfoAdapter;
     private ArrayList<TrackInfo> mTrackInfoList;
     private boolean mSavedInstanceFlag = false;
     private int mPosition;
+    private AdapterView.OnItemClickListener onTrackItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            mPosition = position;
+            boolean tabletModeActive = getActivity().findViewById(R.id.main_container_large) != null;
 
-    public static final String TRACK_ARTIST_ITEM_KEY = "TRACK_ARTIST_ITEM_KEY";
-    private static final String TRACK_INFO_LIST_KEY = "TRACK_INFO_LIST_KEY";
-    private static final String TRACK_POSITION_KEY = "TRACK_POSITION_KEY";
+            // In two-pane mode, we are in the MainActivity activity
+            if (tabletModeActive) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                if (mainActivity.isServiceBound()) {
+                    mainActivity.getMusicService().setTrackItemList(mTrackInfoList);
+                    mainActivity.getMusicService().setTrackPosition(mPosition);
+                    mainActivity.getMusicService().playTrack();
+                }
+                // In single-pane mode, we are in the TrackActivity activity
+            } else {
+                TopTracksActivity topTracksActivity = (TopTracksActivity) getActivity();
+                if (topTracksActivity.isServiceBound()) {
+                    topTracksActivity.getMusicService().setTrackItemList(mTrackInfoList);
+                    topTracksActivity.getMusicService().setTrackPosition(mPosition);
+                    topTracksActivity.getMusicService().playTrack();
+                }
+            }
 
-    @InjectView(R.id.progress_bar_track)ProgressBar progressBarTrack;
-    @InjectView(R.id.listview_tracks) ListView listView;
+            // Show the now-playing fragment
+            DialogFragment playFragment = new PlayFragment();
+            playFragment.show(getActivity().getSupportFragmentManager(), "dialog");
+        }
+    };
 
     // If the activity has been re-created get the list back from saveInstanceState
     @Override
@@ -111,12 +138,12 @@ public class TopTracksFragment extends Fragment {
 
         return rootView;
     }
+
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Setting the titlebar subtitle with the mArtistName
-        // From: http://stackoverflow.com/a/18320838/4836602
-        // AppCompatActivity is used instead of ActionBarActivity
+        // Set the titlebar subtitle with the mArtistName
+        // AppCompatActivity is used instead of ActionBarActivity http://stackoverflow.com/a/18320838/4836602
         ((AppCompatActivity)getActivity()).getSupportActionBar().setSubtitle(mArtistName);
         if (mArtistID != null && !mSavedInstanceFlag) {
             TrackSearchTask trackSearchTask = new TrackSearchTask();
@@ -131,36 +158,6 @@ public class TopTracksFragment extends Fragment {
         savedState.putInt(TRACK_POSITION_KEY, mPosition);
         super.onSaveInstanceState(savedState);
     }
-
-    private AdapterView.OnItemClickListener onTrackItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            mPosition = position;
-            boolean tabletModeActive = getActivity().findViewById(R.id.main_container_large) != null;
-
-            // In two-pane mode, we are in the MainActivity activity
-            if (tabletModeActive) {
-                MainActivity mainActivity = (MainActivity) getActivity();
-                if (mainActivity.isServiceBound()) {
-                    mainActivity.getMusicService().setTrackItemList(mTrackInfoList);
-                    mainActivity.getMusicService().setTrackPosition(mPosition);
-                    mainActivity.getMusicService().playTrack();
-                }
-                // In single-pane mode, we are in the TrackActivity activity
-            } else {
-                TopTracksActivity topTracksActivity = (TopTracksActivity) getActivity();
-                if (topTracksActivity.isServiceBound()) {
-                    topTracksActivity.getMusicService().setTrackItemList(mTrackInfoList);
-                    topTracksActivity.getMusicService().setTrackPosition(mPosition);
-                    topTracksActivity.getMusicService().playTrack();
-                }
-            }
-
-            // Show the now-playing fragment
-            DialogFragment playFragment = new com.example.sherlock.spotifystreamer.fragment.PlayFragment();
-            playFragment.show(getActivity().getSupportFragmentManager(), "dialog");
-        }
-    };
 
     public class TrackSearchTask extends AsyncTask<String, Void, Tracks> {
 
@@ -183,11 +180,9 @@ public class TopTracksFragment extends Fragment {
 
             String track = params[0];
 
-            // Starting a spotify web endpoint req
             SpotifyApi api = new SpotifyApi();
             SpotifyService spotify = api.getService();
             try {
-                // Setting the country with the user selected country from the settings menu
                 Map<String, Object> options = new HashMap<>();
                 options.put("country", Utilities.getCountry(getActivity()));
                 return spotify.getArtistTopTrack(track, options);
@@ -201,15 +196,15 @@ public class TopTracksFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Tracks tracksResults) {
-            // Hiding the progressbar
+
+            // Hide the progressbar
             progressBarTrack.setVisibility(View.GONE);
 
-            //nothing to do here
             if (tracksResults == null) return;
 
             if (tracksResults.tracks.size() == 0){
                 Toast.makeText(getActivity(), "No tracks listed for this artist...", Toast.LENGTH_SHORT).show();
-                getActivity().finish();
+                return;
             }
 
             for (Track track : tracksResults.tracks) {

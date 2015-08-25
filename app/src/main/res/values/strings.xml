@@ -8,7 +8,7 @@
 
     <string name="preferred_country_key">country</string>
     <string name="preferred_country_default">US</string>
-    <string name="preferred_country_label">Country</string>
+    <string name="preferred_country_label">Country Code</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <string name="artist_description">Artist Thumbnail</string>

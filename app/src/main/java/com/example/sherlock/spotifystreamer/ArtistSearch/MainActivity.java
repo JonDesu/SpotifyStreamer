@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.activity;
+package com.example.sherlock.spotifystreamer.ArtistSearch;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -11,35 +11,48 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.example.sherlock.spotifystreamer.Player.PlayFragment;
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.fragment.MainActivityFragment;
-import com.example.sherlock.spotifystreamer.fragment.PlayFragment;
-import com.example.sherlock.spotifystreamer.fragment.TopTracksFragment;
-import com.example.sherlock.spotifystreamer.model.ArtistInfo;
-import com.example.sherlock.spotifystreamer.services.Service;
+import com.example.sherlock.spotifystreamer.Services.MusicService;
+import com.example.sherlock.spotifystreamer.Settings.SettingsActivity;
+import com.example.sherlock.spotifystreamer.TopTracks.TopTracksActivity;
+import com.example.sherlock.spotifystreamer.TopTracks.TopTracksFragment;
 
 
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.Callback{
 
     private static final String TRACK_FRAGMENT_TAG = "TRACK_FRAGMENT_TAG";
 
-    private boolean mTwoPanesActive;
+    private boolean mTabletModeActive;
     private MainActivityFragment mainActivityFragment;
-    private Service mMusicService;
+    private MusicService mMusicService;
     private boolean mIsServiceBound = false;
-    private Toast mToast;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
 
-    private static final String ARTIST_SEARCHED_KEY = "ARTIST_SEARCHED";
+            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+            mMusicService = binder.getService();
+            mIsServiceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mIsServiceBound = false;
+        }
+    };
 
     @Override
     protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
+        receiveIntent(intent);
     }
 
-    private void handleIntent(Intent intent) {
-        // Get the intent, verify the action and get the query
+    private void receiveIntent(Intent intent) {
+
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String intentExtra = intent.getStringExtra(SearchManager.QUERY);
             mainActivityFragment.searchForArtists(intentExtra);
@@ -51,12 +64,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Is the app running on a tablet?
-        mTwoPanesActive = findViewById(R.id.main_container_large) != null;
+        mTabletModeActive = findViewById(R.id.main_container_large) != null;
 
         // In two-pane mode, show the detail view in this activity by adding or replacing
         // the detail fragment using a fragment transaction
-        if (mTwoPanesActive) {
+        if (mTabletModeActive) {
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.track_container_large, new TopTracksFragment(), TRACK_FRAGMENT_TAG)
@@ -64,12 +76,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             }
         }
 
-        // Get the main fragment of this activity
         mainActivityFragment =
                 (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
 
-        // Handling search intent
-        handleIntent(getIntent());
+        receiveIntent(getIntent());
     }
 
     @Override
@@ -81,13 +91,22 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.menu_now_playing){
+        if (id == R.id.menu_now_playing) {
             if (mIsServiceBound && !mMusicService.isEmpty()) {
+
+                View view = this.getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+
                 DialogFragment playFragment = new PlayFragment();
                 playFragment.show(getSupportFragmentManager(), "dialog");
             } else {
                 Toast.makeText(this, "Please select a track...", Toast.LENGTH_SHORT).show();
             }
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -96,10 +115,17 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     @Override
     protected void onStart() {
         super.onStart();
-        // Binding the service
-        Intent intent = new Intent(this, Service.class);
+
+        Intent intent = new Intent(this, MusicService.class);
         startService(intent);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unbinding the service
+        unbindService(mServiceConnection);
     }
 
     /**
@@ -107,8 +133,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
      */
     @Override
     public void onArtistItemSelected(ArtistInfo artistInfo) {
-        // In single-pane mode, add the trackFragment to the container
-        if (mTwoPanesActive) {
+
+        if (mTabletModeActive) {
             Bundle bundle = new Bundle();
             bundle.putParcelable(TopTracksFragment.TRACK_ARTIST_ITEM_KEY, artistInfo);
 
@@ -118,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.track_container_large, fragment, TRACK_FRAGMENT_TAG)
                     .commit();
-            // In two-pane mode, start TrackActivity
+
         } else {
             Intent intent = new Intent(this, TopTracksActivity.class);
             Bundle bundle = new Bundle();
@@ -128,24 +154,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         }
     }
 
-    /**
-     * Setting the MusicService Binding
-     */
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // Saving an istance of the binded service
-            Service.MusicBinder binder = (Service.MusicBinder) service;
-            mMusicService = binder.getService();
-            mIsServiceBound = true;
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mIsServiceBound = false;
-        }
-    };
-
-    public Service getMusicService() {
+    public MusicService getMusicService() {
         return mMusicService;
     }
 

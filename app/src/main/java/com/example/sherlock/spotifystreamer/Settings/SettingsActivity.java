@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.activity;
+package com.example.sherlock.spotifystreamer.Settings;
 
 import android.annotation.TargetApi;
 import android.content.Intent;

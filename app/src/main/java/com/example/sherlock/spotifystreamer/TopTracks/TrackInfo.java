@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.model;
+package com.example.sherlock.spotifystreamer.TopTracks;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,6 +9,20 @@ import kaaes.spotify.webapi.android.models.Track;
  * Created by Jon on 6/25/15.
  */
 public class TrackInfo implements Parcelable{
+    /**
+     * Creates TrackParcelable model from Parcel.
+     */
+    public static final Parcelable.Creator CREATOR = new Creator() {
+        @Override
+        public TrackInfo createFromParcel(Parcel source) {
+            return new TrackInfo(source);
+        }
+
+        @Override
+        public TrackInfo[] newArray(int size) {
+            return new TrackInfo[size];
+        }
+    };
     private String mIconUrl;
     private String mTrackTitle;
     private String mAlbumName;
@@ -50,19 +64,6 @@ public class TrackInfo implements Parcelable{
         dest.writeString(mTrackTitle);
         dest.writeString(mAlbumName);
     }
-
-    /** Creates TrackParcelable model from Parcel. */
-    public static final Parcelable.Creator CREATOR = new Creator() {
-        @Override
-        public TrackInfo createFromParcel(Parcel source) {
-            return new TrackInfo(source);
-        }
-
-        @Override
-        public TrackInfo[] newArray(int size) {
-            return new TrackInfo[size];
-        }
-    };
 
     public String getTrackTitle(){
         return mTrackTitle;
