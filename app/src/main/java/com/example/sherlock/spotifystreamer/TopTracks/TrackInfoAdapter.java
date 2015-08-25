@@ -19,9 +19,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-/**
- * Created by Jon on 6/25/15.
- */
 public class TrackInfoAdapter extends ArrayAdapter<TrackInfo> {
 
     private final String LOG_TAG = ArtistInfoAdapter.class.getSimpleName();
@@ -87,4 +84,5 @@ public class TrackInfoAdapter extends ArrayAdapter<TrackInfo> {
             ButterKnife.inject(this, view);
         }
     }
+
 }

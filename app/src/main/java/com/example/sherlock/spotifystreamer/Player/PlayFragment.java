@@ -108,6 +108,63 @@ public class PlayFragment extends DialogFragment {
         return dialog;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        getActivity().startService(intent);
+        getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
+        boolean hasTwoPanes = getActivity().findViewById(R.id.main_container_large) != null;
+        if (!hasTwoPanes) {
+            Dialog dialog = getDialog();
+            if (dialog != null) {
+                int width = ViewGroup.LayoutParams.MATCH_PARENT;
+                int height = ViewGroup.LayoutParams.MATCH_PARENT;
+                dialog.getWindow().setLayout(width, height);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity()).
+                registerReceiver(mBroadcastReceiver,
+                        new IntentFilter(MusicService.BROADCAST_PLAYBACK_STATE_CHANGED));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // http://stackoverflow.com/questions/6165070/receiver-not-registered-exception-error
+        try {
+            getActivity().unregisterReceiver(mBroadcastReceiver);
+            mBroadcastReceiver = null;
+        } catch (Exception e) {
+            Log.e("unregisterReceiver", "Receiver not registered");
+        }
+        // Cleanup! Remove runnable callback from the seekbar handler
+        if (mSeekbarHandler != null) {
+            mSeekbarHandler.removeCallbacks(runnableSeekBar);
+        }
+        mSeekbarHandler = null;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().unbindService(mServiceConnection);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance())
+            getDialog().setDismissMessage(null);
+        super.onDestroyView();
+    }
+
     @OnClick(R.id.next_button)
     public void buttonNextClicked() {
         sendActionToService(MusicService.INTENT_ACTION_NEXT);
@@ -180,62 +237,6 @@ public class PlayFragment extends DialogFragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Intent intent = new Intent(getActivity(), MusicService.class);
-        getActivity().startService(intent);
-        getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-
-        boolean hasTwoPanes = getActivity().findViewById(R.id.main_container_large) != null;
-        if (!hasTwoPanes) {
-            Dialog dialog = getDialog();
-            if (dialog != null) {
-                int width = ViewGroup.LayoutParams.MATCH_PARENT;
-                int height = ViewGroup.LayoutParams.MATCH_PARENT;
-                dialog.getWindow().setLayout(width, height);
-            }
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).
-                registerReceiver(mBroadcastReceiver,
-                        new IntentFilter(MusicService.BROADCAST_PLAYBACK_STATE_CHANGED));
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        // http://stackoverflow.com/questions/6165070/receiver-not-registered-exception-error
-        try {
-            getActivity().unregisterReceiver(mBroadcastReceiver);
-            mBroadcastReceiver = null;
-        } catch (Exception e) {
-            Log.e("unregisterReceiver", "Receiver not registered");
-        }
-        // Cleanup! Remove runnable callback from the seekbar handler
-        if (mSeekbarHandler != null) {
-            mSeekbarHandler.removeCallbacks(runnableSeekBar);
-        }
-        mSeekbarHandler = null;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        getActivity().unbindService(mServiceConnection);
-    }
-
-    @Override
-    public void onDestroyView() {
-        if (getDialog() != null && getRetainInstance())
-            getDialog().setDismissMessage(null);
-        super.onDestroyView();
-    }
 
     private void setSeekBar() {
         seekBar.setMax(30);

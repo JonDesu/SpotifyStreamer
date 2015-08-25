@@ -18,29 +18,10 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Add 'general' preferences, defined in the XML file
+
         addPreferencesFromResource(R.xml.preferences);
 
-        // For the country preference, attach an OnPreferenceChangeListener
-        // so the UI summary can be updated when the preference changes.
         bindPreferenceSummaryToValue(findPreference(getString(R.string.preferred_country_key)));
-    }
-
-    /**
-     * Attaches a listener so the summary is always updated with the preference value.
-     * Also fires the listener once, to initialize the summary (so it shows up before the value
-     * is changed.)
-     */
-    private void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(this);
-
-        // Trigger the listener immediately with the preference's
-        // current value.
-        onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
     }
 
     @Override
@@ -60,6 +41,16 @@ public class SettingsActivity extends PreferenceActivity
             preference.setSummary(stringValue);
         }
         return true;
+    }
+
+
+    private void bindPreferenceSummaryToValue(Preference preference) {
+
+        preference.setOnPreferenceChangeListener(this);
+        onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getString(preference.getKey(), ""));
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

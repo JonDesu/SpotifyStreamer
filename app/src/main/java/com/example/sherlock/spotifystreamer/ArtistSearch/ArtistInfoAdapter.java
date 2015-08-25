@@ -22,7 +22,6 @@ import butterknife.InjectView;
 public class ArtistInfoAdapter extends ArrayAdapter<ArtistInfo> {
 
     private final String LOG_TAG = ArtistInfoAdapter.class.getSimpleName();
-
     private Context mContext;
     private int mLayoutResourceID;
     private List<ArtistInfo> mArtistList;
@@ -78,4 +77,6 @@ public class ArtistInfoAdapter extends ArrayAdapter<ArtistInfo> {
             ButterKnife.inject(this, view);
         }
     }
+
+
 }

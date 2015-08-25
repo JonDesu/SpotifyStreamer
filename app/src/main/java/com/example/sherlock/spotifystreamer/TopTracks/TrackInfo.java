@@ -5,13 +5,8 @@ import android.os.Parcelable;
 
 import kaaes.spotify.webapi.android.models.Track;
 
-/**
- * Created by Jon on 6/25/15.
- */
 public class TrackInfo implements Parcelable{
-    /**
-     * Creates TrackParcelable model from Parcel.
-     */
+
     public static final Parcelable.Creator CREATOR = new Creator() {
         @Override
         public TrackInfo createFromParcel(Parcel source) {

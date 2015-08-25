@@ -19,9 +19,6 @@ public class TopTracksActivity extends AppCompatActivity {
 
     private MusicService mMusicService;
     private boolean mIsServiceBound = false;
-    /**
-     * Setting the MusicService Binding
-     */
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {

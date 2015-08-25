@@ -151,7 +151,6 @@ public class TopTracksFragment extends Fragment {
         }
     }
 
-    // Saving the current parcelable item list
     @Override
     public void onSaveInstanceState(Bundle savedState) {
         savedState.putParcelableArrayList(TRACK_INFO_LIST_KEY, mTrackInfoList);
