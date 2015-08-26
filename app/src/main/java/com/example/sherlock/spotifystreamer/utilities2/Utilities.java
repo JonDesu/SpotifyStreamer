@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.utilities;
+package com.example.sherlock.spotifystreamer.utilities2;
 
 import android.app.Activity;
 import android.content.Context;
