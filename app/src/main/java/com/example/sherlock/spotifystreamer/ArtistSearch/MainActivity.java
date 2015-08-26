@@ -28,9 +28,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     private static final String TRACK_FRAGMENT_TAG = "TRACK_FRAGMENT_TAG";
 
     private boolean mTabletModeActive;
+    private boolean mIsServiceBound = false;
     private MainActivityFragment mainActivityFragment;
     private com.example.sherlock.spotifystreamer.Services.MusicService mMusicService;
-    private boolean mIsServiceBound = false;
+
+
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {

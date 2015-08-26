@@ -46,6 +46,7 @@ public class PlayFragment extends DialogFragment {
     @InjectView(R.id.play_button) Button playButton;
     @InjectView(R.id.progressbar) ProgressBar progressBar;
     @InjectView(R.id.play_seekbar) SeekBar seekBar;
+
     private MusicService mMusicService;
     private Handler mSeekbarHandler = null;
     private boolean mIsServiceBound = false;
@@ -236,7 +237,6 @@ public class PlayFragment extends DialogFragment {
             mSeekbarHandler = null;
         }
     }
-
 
     private void setSeekBar() {
         seekBar.setMax(30);
