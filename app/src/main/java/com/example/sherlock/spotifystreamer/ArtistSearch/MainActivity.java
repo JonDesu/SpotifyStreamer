@@ -29,13 +29,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     private boolean mTabletModeActive;
     private MainActivityFragment mainActivityFragment;
-    private com.example.sherlock.spotifystreamer.Services.MusicService mMusicService;
+    private com.example.sherlock.spotifystreamer.service.MusicService mMusicService;
     private boolean mIsServiceBound = false;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
 
-            com.example.sherlock.spotifystreamer.Services.MusicService.MusicBinder binder = (com.example.sherlock.spotifystreamer.Services.MusicService.MusicBinder) service;
+            com.example.sherlock.spotifystreamer.service.MusicService.MusicBinder binder = (com.example.sherlock.spotifystreamer.service.MusicService.MusicBinder) service;
             mMusicService = binder.getService();
             mIsServiceBound = true;
         }
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
     protected void onStart() {
         super.onStart();
 
-        Intent intent = new Intent(this, com.example.sherlock.spotifystreamer.Services.MusicService.class);
+        Intent intent = new Intent(this, com.example.sherlock.spotifystreamer.service.MusicService.class);
         startService(intent);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         }
     }
 
-    public com.example.sherlock.spotifystreamer.Services.MusicService getMusicService() {
+    public com.example.sherlock.spotifystreamer.service.MusicService getMusicService() {
         return mMusicService;
     }
 

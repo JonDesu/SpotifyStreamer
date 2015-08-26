@@ -24,7 +24,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.Services.MusicService;
+import com.example.sherlock.spotifystreamer.service.MusicService;
 import com.squareup.picasso.Picasso;
 
 import butterknife.ButterKnife;

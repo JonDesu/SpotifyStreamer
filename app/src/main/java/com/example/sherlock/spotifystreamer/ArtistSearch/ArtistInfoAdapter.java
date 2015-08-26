@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.Utilities.CircleTransform;
+import com.example.sherlock.spotifystreamer.utilities.CircleTransform;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

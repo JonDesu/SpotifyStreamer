@@ -11,9 +11,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.example.sherlock.spotifystreamer.R;
 
-/**
- * Created by Jon on 6/25/15.
- */
 public class Utilities {
 
     public static boolean NetworkAvailable(Activity context) {

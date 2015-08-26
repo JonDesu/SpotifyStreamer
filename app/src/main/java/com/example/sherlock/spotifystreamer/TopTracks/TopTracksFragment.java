@@ -19,7 +19,7 @@ import com.example.sherlock.spotifystreamer.ArtistSearch.ArtistInfo;
 import com.example.sherlock.spotifystreamer.ArtistSearch.MainActivity;
 import com.example.sherlock.spotifystreamer.Player.PlayFragment;
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.Utilities.Utilities;
+import com.example.sherlock.spotifystreamer.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;

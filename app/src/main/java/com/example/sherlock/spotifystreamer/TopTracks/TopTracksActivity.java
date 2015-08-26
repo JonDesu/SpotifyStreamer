@@ -11,8 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.Services.MusicService;
 import com.example.sherlock.spotifystreamer.Settings.SettingsActivity;
+import com.example.sherlock.spotifystreamer.service.MusicService;
 
 
 public class TopTracksActivity extends AppCompatActivity {
