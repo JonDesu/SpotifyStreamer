@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.service;
+package com.example.sherlock.spotifystreamer.Services;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,7 +19,7 @@ import android.util.Log;
 import com.example.sherlock.spotifystreamer.ArtistSearch.MainActivity;
 import com.example.sherlock.spotifystreamer.R;
 import com.example.sherlock.spotifystreamer.TopTracks.TrackInfo;
-import com.example.sherlock.spotifystreamer.utilities2.Utilities;
+import com.example.sherlock.spotifystreamer.Utilities.Utilities;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

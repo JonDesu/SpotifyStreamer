@@ -1,4 +1,4 @@
-package com.example.sherlock.spotifystreamer.utilities2;
+package com.example.sherlock.spotifystreamer.Utilities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

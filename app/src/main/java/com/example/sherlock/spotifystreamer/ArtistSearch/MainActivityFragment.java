@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sherlock.spotifystreamer.R;
-import com.example.sherlock.spotifystreamer.utilities2.Utilities;
+import com.example.sherlock.spotifystreamer.Utilities.Utilities;
 
 import java.util.ArrayList;
 
