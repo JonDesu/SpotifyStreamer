@@ -130,9 +130,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         unbindService(mServiceConnection);
     }
 
-    /**
-     * Managing the artist click
-     */
     @Override
     public void onArtistItemSelected(ArtistInfo artistInfo) {
 

@@ -31,10 +31,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-/**
- * PlayFragment
- * Shows and manages the playback of the tracks.
- */
 public class PlayFragment extends DialogFragment {
 
     @InjectView(R.id.play_image_view) ImageView imageView;

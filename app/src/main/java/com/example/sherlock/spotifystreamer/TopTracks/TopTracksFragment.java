@@ -32,10 +32,6 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
-
-/**
- * A placeholder fragment containing a simple view.
- */
 public class TopTracksFragment extends Fragment {
 
     public static final String TRACK_ARTIST_ITEM_KEY = "TRACK_ARTIST_ITEM_KEY";
